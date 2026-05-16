@@ -7,11 +7,38 @@ tags:
   - Insurance
   - Auto Insurance
   - Property & Casualty
-description: 'The second-largest private passenger auto insurance company in the United States and a subsidiary of Berkshire Hathaway. Known for its direct-to-consumer model, competitive rates, and iconic advertising campaigns.'
+  - Direct-to-Consumer
+description: 'The second-largest private passenger auto insurance company in the United States and a subsidiary of Berkshire Hathaway. Known for its direct-to-consumer model, competitive rates, and iconic advertising campaigns. GEICO serves customers through its website, GEICO Mobile app, and call centers rather than through a public API.'
 created: '2026-05-05'
-modified: '2026-05-05'
+modified: '2026-05-16'
 specificationVersion: '0.19'
 apis: []
+x-no-public-api: true
+x-no-public-api-reason: >-
+  GEICO does not publish a public developer portal, OpenAPI specs, or
+  third-party developer API documentation for quoting, binding, claims, or
+  policy servicing. GEICO's customer surface is the geico.com website, the
+  GEICO Mobile app, and call centers. Any agent/partner integrations
+  (comparative raters, dealer integrations) are arranged under private B2B
+  agreements rather than a self-service API program.
 common:
   - type: Website
     url: https://www.geico.com/
+  - type: MobileApp
+    url: https://www.geico.com/mobile/
+  - type: Quote
+    url: https://www.geico.com/auto-insurance/
+  - type: Claims
+    url: https://www.geico.com/claims/
+  - type: AboutUs
+    url: https://www.geico.com/about/
+  - type: Careers
+    url: https://careers.geico.com/
+  - type: ContactUs
+    url: https://www.geico.com/contact-us/
+  - type: PrivacyPolicy
+    url: https://www.geico.com/privacy/
+  - type: TermsOfService
+    url: https://www.geico.com/legal/
+  - type: Login
+    url: https://ecams.geico.com/login
