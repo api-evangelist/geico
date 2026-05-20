@@ -22,6 +22,10 @@ x-no-public-api-reason: >-
   (comparative raters, dealer integrations) are arranged under private B2B
   agreements rather than a self-service API program.
 common:
+  - type: GitHubOrganization
+    url: https://github.com/GEICO
+  - type: LinkedIn
+    url: https://www.linkedin.com/company/geico
   - type: Website
     url: https://www.geico.com/
   - type: MobileApp
