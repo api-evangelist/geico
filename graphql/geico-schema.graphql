@@ -1,0 +1,1104 @@
+"""
+GEICO Insurance - Conceptual GraphQL Schema
+Covers auto, home, renters, motorcycle, boat, life, and business insurance
+product lines as offered by GEICO (a Berkshire Hathaway subsidiary).
+This schema is derived from public product documentation and does not
+represent an officially published GEICO API.
+"""
+
+# ─────────────────────────────────────────────
+# Scalars
+# ─────────────────────────────────────────────
+
+scalar Date
+scalar DateTime
+scalar Decimal
+scalar JSON
+
+# ─────────────────────────────────────────────
+# Enums
+# ─────────────────────────────────────────────
+
+enum PolicyType {
+  AUTO
+  HOME
+  RENTERS
+  MOTORCYCLE
+  BOAT
+  LIFE
+  BUSINESS
+}
+
+enum PolicyStatus {
+  ACTIVE
+  PENDING
+  CANCELLED
+  EXPIRED
+  SUSPENDED
+}
+
+enum ClaimStatusCode {
+  REPORTED
+  UNDER_REVIEW
+  INSPECTION_SCHEDULED
+  ESTIMATE_PREPARED
+  APPROVED
+  IN_REPAIR
+  PAYMENT_ISSUED
+  CLOSED
+  DENIED
+}
+
+enum CoverageType {
+  BODILY_INJURY
+  PROPERTY_DAMAGE
+  COLLISION
+  COMPREHENSIVE
+  UNINSURED_MOTORIST
+  UNDERINSURED_MOTORIST
+  PERSONAL_INJURY_PROTECTION
+  MEDICAL_PAYMENTS
+  RENTAL_REIMBURSEMENT
+  ROADSIDE_ASSISTANCE
+  GAP
+}
+
+enum VehicleUse {
+  PLEASURE
+  COMMUTE
+  BUSINESS
+  FARM
+}
+
+enum DiscountType {
+  MILITARY
+  FEDERAL_EMPLOYEE
+  GOOD_DRIVER
+  MULTI_POLICY
+  MULTI_VEHICLE
+  MATURE_DRIVER
+  NEW_VEHICLE
+  GOOD_STUDENT
+  DAYTIME_RUNNING_LIGHTS
+  ANTI_THEFT
+  ANTI_LOCK_BRAKES
+  AIRBAGS
+  EMERGENCY_DEPLOYMENT
+  DRIVE_EASY
+  SEAT_BELT
+  DEFENSIVE_DRIVING
+}
+
+enum PaymentFrequency {
+  ANNUAL
+  SEMI_ANNUAL
+  QUARTERLY
+  MONTHLY
+}
+
+enum PropertyType {
+  SINGLE_FAMILY
+  CONDO
+  TOWNHOUSE
+  MOBILE_HOME
+  MULTI_FAMILY
+  RENTAL
+}
+
+enum BoatType {
+  MOTORBOAT
+  SAILBOAT
+  PERSONAL_WATERCRAFT
+  PONTOON
+  HOUSEBOAT
+  YACHT
+}
+
+enum LifePolicyType {
+  TERM
+  WHOLE
+  UNIVERSAL
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  NON_BINARY
+  UNSPECIFIED
+}
+
+enum MaritalStatus {
+  SINGLE
+  MARRIED
+  DIVORCED
+  WIDOWED
+}
+
+enum LicenseStatus {
+  VALID
+  SUSPENDED
+  REVOKED
+  EXPIRED
+  INTERNATIONAL
+}
+
+# ─────────────────────────────────────────────
+# Interfaces
+# ─────────────────────────────────────────────
+
+"""Base interface for all GEICO insurance policy types."""
+interface Policy {
+  id: ID!
+  policyNumber: String!
+  type: PolicyType!
+  status: PolicyStatus!
+  effectiveDate: Date!
+  expirationDate: Date!
+  policyHolder: PolicyHolder!
+  premium: Premium!
+  discounts: [GeicoDiscount!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Base interface for all GEICO discount types."""
+interface GeicoDiscount {
+  id: ID!
+  type: DiscountType!
+  description: String!
+  amount: Decimal!
+  percentage: Decimal
+  appliedAt: DateTime!
+  eligibilityCriteria: String
+}
+
+# ─────────────────────────────────────────────
+# Policy Holder & Named Insured
+# ─────────────────────────────────────────────
+
+"""The primary account holder who owns one or more GEICO policies."""
+type PolicyHolder {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  dateOfBirth: Date!
+  gender: Gender
+  maritalStatus: MaritalStatus
+  email: String!
+  phone: String
+  address: Address!
+  ssn: String
+  occupation: String
+  policies: [Policy!]!
+  namedInsureds: [NamedInsured!]!
+  driveEasy: DriveEasy
+  agentId: ID
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""A person named on the policy who may also be a driver or co-owner."""
+type NamedInsured {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  relationship: String!
+  dateOfBirth: Date!
+  gender: Gender
+  licenseNumber: String
+  licenseState: String
+  licenseStatus: LicenseStatus
+  yearsLicensed: Int
+  mvrRecords: [MVRRecord!]!
+  accidentRecords: [AccidentRecord!]!
+  violationRecords: [ViolationRecord!]!
+}
+
+"""A secondary driver added to an auto policy."""
+type AdditionalDriver {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  dateOfBirth: Date!
+  gender: Gender
+  maritalStatus: MaritalStatus
+  licenseNumber: String!
+  licenseState: String!
+  licenseStatus: LicenseStatus!
+  yearsLicensed: Int!
+  occupation: String
+  goodStudentDiscount: Boolean
+  mvrRecords: [MVRRecord!]!
+  accidentRecords: [AccidentRecord!]!
+  violationRecords: [ViolationRecord!]!
+}
+
+type Address {
+  street1: String!
+  street2: String
+  city: String!
+  state: String!
+  zip: String!
+  county: String
+  country: String!
+}
+
+# ─────────────────────────────────────────────
+# Driving History Records
+# ─────────────────────────────────────────────
+
+"""Motor Vehicle Record entry from a state DMV."""
+type MVRRecord {
+  id: ID!
+  state: String!
+  reportDate: Date!
+  licenseStatus: LicenseStatus!
+  violations: [ViolationRecord!]!
+  accidents: [AccidentRecord!]!
+}
+
+"""An at-fault or not-at-fault accident on a driver's record."""
+type AccidentRecord {
+  id: ID!
+  incidentDate: Date!
+  atFault: Boolean!
+  description: String
+  claimAmount: Decimal
+  surchargeYears: Int
+}
+
+"""A moving or non-moving violation on a driver's record."""
+type ViolationRecord {
+  id: ID!
+  violationDate: Date!
+  violationType: String!
+  description: String
+  state: String!
+  points: Int
+  surchargeYears: Int
+}
+
+# ─────────────────────────────────────────────
+# Vehicle
+# ─────────────────────────────────────────────
+
+"""A vehicle covered under an auto, motorcycle, or boat policy."""
+type Vehicle {
+  id: ID!
+  vin: VIN!
+  details: VehicleDetails!
+  use: VehicleUse!
+  annualMileage: Int
+  ownershipType: String
+  garagingAddress: Address
+  safetyFeatures: [SafetyFeature!]!
+  primaryDriver: NamedInsured
+  additionalDrivers: [AdditionalDriver!]!
+  coverages: [Coverage!]!
+  premium: Premium!
+}
+
+"""Decoded VIN information for a vehicle."""
+type VIN {
+  number: String!
+  isValid: Boolean!
+  decodedYear: AutoYear
+  decodedMake: AutoMake
+  decodedModel: AutoModel
+  decodedTrim: String
+  decodedBodyStyle: String
+  decodedEngine: String
+  decodedTransmission: String
+}
+
+"""Detailed make/model/trim descriptor for a vehicle."""
+type VehicleDetails {
+  year: AutoYear!
+  make: AutoMake!
+  model: AutoModel!
+  trim: String
+  bodyStyle: String
+  msrp: Decimal
+  vehicleType: String
+}
+
+"""Model year of a vehicle, e.g. 2024."""
+type AutoYear {
+  year: Int!
+  makes: [AutoMake!]!
+}
+
+"""Vehicle manufacturer, e.g. Toyota."""
+type AutoMake {
+  id: ID!
+  name: String!
+  models: [AutoModel!]!
+}
+
+"""Vehicle model line, e.g. Camry."""
+type AutoModel {
+  id: ID!
+  name: String!
+  make: AutoMake!
+  trims: [String!]
+}
+
+"""A safety or anti-theft feature affecting premium calculation."""
+type SafetyFeature {
+  id: ID!
+  featureType: String!
+  description: String!
+  discountEligible: Boolean!
+}
+
+# ─────────────────────────────────────────────
+# Policy Types
+# ─────────────────────────────────────────────
+
+"""An automobile insurance policy."""
+type AutoPolicy implements Policy {
+  id: ID!
+  policyNumber: String!
+  type: PolicyType!
+  status: PolicyStatus!
+  effectiveDate: Date!
+  expirationDate: Date!
+  policyHolder: PolicyHolder!
+  premium: Premium!
+  discounts: [GeicoDiscount!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  vehicles: [Vehicle!]!
+  namedInsureds: [NamedInsured!]!
+  additionalDrivers: [AdditionalDriver!]!
+  detail: PolicyDetail!
+  driveEasyEnrolled: Boolean!
+}
+
+"""A homeowners insurance policy."""
+type HomePolicy implements Policy {
+  id: ID!
+  policyNumber: String!
+  type: PolicyType!
+  status: PolicyStatus!
+  effectiveDate: Date!
+  expirationDate: Date!
+  policyHolder: PolicyHolder!
+  premium: Premium!
+  discounts: [GeicoDiscount!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  propertyAddress: Address!
+  propertyType: PropertyType!
+  yearBuilt: Int
+  squareFootage: Int
+  dwellingCoverage: Decimal!
+  personalPropertyCoverage: Decimal!
+  liabilityCoverage: Decimal!
+  additionalLivingExpenses: Decimal
+  deductible: Deductible!
+  detail: PolicyDetail!
+}
+
+"""A renters insurance policy."""
+type RentersPolicy implements Policy {
+  id: ID!
+  policyNumber: String!
+  type: PolicyType!
+  status: PolicyStatus!
+  effectiveDate: Date!
+  expirationDate: Date!
+  policyHolder: PolicyHolder!
+  premium: Premium!
+  discounts: [GeicoDiscount!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  rentalAddress: Address!
+  personalPropertyCoverage: Decimal!
+  liabilityCoverage: Decimal!
+  medicalPaymentsCoverage: Decimal
+  deductible: Deductible!
+  detail: PolicyDetail!
+}
+
+"""A motorcycle insurance policy."""
+type MotorcyclePolicy implements Policy {
+  id: ID!
+  policyNumber: String!
+  type: PolicyType!
+  status: PolicyStatus!
+  effectiveDate: Date!
+  expirationDate: Date!
+  policyHolder: PolicyHolder!
+  premium: Premium!
+  discounts: [GeicoDiscount!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  vehicle: Vehicle!
+  namedInsureds: [NamedInsured!]!
+  detail: PolicyDetail!
+}
+
+"""A boat or watercraft insurance policy."""
+type BoatPolicy implements Policy {
+  id: ID!
+  policyNumber: String!
+  type: PolicyType!
+  status: PolicyStatus!
+  effectiveDate: Date!
+  expirationDate: Date!
+  policyHolder: PolicyHolder!
+  premium: Premium!
+  discounts: [GeicoDiscount!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  boatType: BoatType!
+  year: Int!
+  make: String!
+  model: String!
+  length: Decimal
+  hullValue: Decimal!
+  motorValue: Decimal
+  trailerValue: Decimal
+  detail: PolicyDetail!
+}
+
+"""A life insurance policy."""
+type LifePolicy implements Policy {
+  id: ID!
+  policyNumber: String!
+  type: PolicyType!
+  status: PolicyStatus!
+  effectiveDate: Date!
+  expirationDate: Date!
+  policyHolder: PolicyHolder!
+  premium: Premium!
+  discounts: [GeicoDiscount!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  lifePolicyType: LifePolicyType!
+  faceValue: Decimal!
+  termYears: Int
+  beneficiaries: [Beneficiary!]!
+  detail: PolicyDetail!
+}
+
+"""A commercial or business auto insurance policy."""
+type BusinessPolicy implements Policy {
+  id: ID!
+  policyNumber: String!
+  type: PolicyType!
+  status: PolicyStatus!
+  effectiveDate: Date!
+  expirationDate: Date!
+  policyHolder: PolicyHolder!
+  premium: Premium!
+  discounts: [GeicoDiscount!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  businessName: String!
+  businessType: String!
+  dot: String
+  vehicles: [Vehicle!]!
+  detail: PolicyDetail!
+}
+
+"""Extended metadata for any policy type."""
+type PolicyDetail {
+  id: ID!
+  policyId: ID!
+  agentId: ID
+  paymentFrequency: PaymentFrequency!
+  autoPayEnrolled: Boolean!
+  paperlessEnrolled: Boolean!
+  renewalDate: Date!
+  cancellationReason: String
+  notes: String
+}
+
+type Beneficiary {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  relationship: String!
+  percentage: Decimal!
+  dateOfBirth: Date
+}
+
+# ─────────────────────────────────────────────
+# Coverage Types
+# ─────────────────────────────────────────────
+
+"""A coverage applied to a policy or vehicle."""
+type Coverage {
+  id: ID!
+  type: CoverageType!
+  limit: Decimal
+  deductible: Deductible
+  premium: Decimal!
+  description: String
+}
+
+"""Bodily injury liability coverage with per-person and per-occurrence limits."""
+type BodilyInjury {
+  id: ID!
+  perPersonLimit: Decimal!
+  perOccurrenceLimit: Decimal!
+  premium: Decimal!
+}
+
+"""Property damage liability coverage."""
+type PropertyDamage {
+  id: ID!
+  limit: Decimal!
+  premium: Decimal!
+}
+
+"""Collision coverage for damage from accidents."""
+type Collision {
+  id: ID!
+  deductible: Deductible!
+  premium: Decimal!
+  waived: Boolean!
+}
+
+"""Comprehensive coverage for non-collision losses."""
+type Comprehensive {
+  id: ID!
+  deductible: Deductible!
+  premium: Decimal!
+  glassDeductibleWaived: Boolean!
+}
+
+"""Uninsured and underinsured motorist coverage."""
+type UninsuredMotorist {
+  id: ID!
+  bodilyInjuryLimit: Decimal!
+  propertyDamageLimit: Decimal
+  premium: Decimal!
+  stacked: Boolean!
+}
+
+"""Personal injury protection (no-fault) coverage."""
+type PersonalInjuryProtection {
+  id: ID!
+  limit: Decimal!
+  deductible: Deductible
+  premium: Decimal!
+}
+
+"""Medical payments coverage."""
+type MedicalPayments {
+  id: ID!
+  limit: Decimal!
+  premium: Decimal!
+}
+
+"""A policy or coverage deductible."""
+type Deductible {
+  id: ID!
+  amount: Decimal!
+  type: String!
+  description: String
+}
+
+# ─────────────────────────────────────────────
+# Premium & Rate Quote
+# ─────────────────────────────────────────────
+
+"""The calculated insurance premium for a policy or vehicle."""
+type Premium {
+  id: ID!
+  basePremium: Decimal!
+  totalPremium: Decimal!
+  taxesAndFees: Decimal!
+  discountTotal: Decimal!
+  paymentFrequency: PaymentFrequency!
+  installmentAmount: Decimal!
+  effectiveDate: Date!
+  ratingFactors: JSON
+}
+
+"""A rate quote for prospective insurance coverage."""
+type RateQuote {
+  id: ID!
+  quoteNumber: String!
+  policyType: PolicyType!
+  effectiveDate: Date!
+  expirationDate: Date!
+  policyHolder: PolicyHolder!
+  vehicles: [Vehicle!]
+  coverages: [Coverage!]!
+  estimatedPremium: Premium!
+  discountsApplied: [GeicoDiscount!]!
+  bindableUntil: DateTime!
+  createdAt: DateTime!
+}
+
+# ─────────────────────────────────────────────
+# Discount Types
+# ─────────────────────────────────────────────
+
+"""Discount for active duty, veteran, or retired military personnel."""
+type MilitaryDiscount implements GeicoDiscount {
+  id: ID!
+  type: DiscountType!
+  description: String!
+  amount: Decimal!
+  percentage: Decimal
+  appliedAt: DateTime!
+  eligibilityCriteria: String
+  branch: String
+  servicePeriod: String
+}
+
+"""Discount for federal government employees."""
+type FederalDiscount implements GeicoDiscount {
+  id: ID!
+  type: DiscountType!
+  description: String!
+  amount: Decimal!
+  percentage: Decimal
+  appliedAt: DateTime!
+  eligibilityCriteria: String
+  agency: String
+}
+
+"""Discount for drivers with a clean driving record (typically 5 years)."""
+type GoodDriverDiscount implements GeicoDiscount {
+  id: ID!
+  type: DiscountType!
+  description: String!
+  amount: Decimal!
+  percentage: Decimal
+  appliedAt: DateTime!
+  eligibilityCriteria: String
+  yearsClean: Int!
+}
+
+"""Discount for bundling multiple GEICO policies."""
+type MultiPolicy implements GeicoDiscount {
+  id: ID!
+  type: DiscountType!
+  description: String!
+  amount: Decimal!
+  percentage: Decimal
+  appliedAt: DateTime!
+  eligibilityCriteria: String
+  bundledPolicies: [String!]!
+}
+
+"""Discount for insuring multiple vehicles on the same policy."""
+type MultiVehicle implements GeicoDiscount {
+  id: ID!
+  type: DiscountType!
+  description: String!
+  amount: Decimal!
+  percentage: Decimal
+  appliedAt: DateTime!
+  eligibilityCriteria: String
+  vehicleCount: Int!
+}
+
+"""Discount for mature drivers (typically 50+) who complete a safety course."""
+type MatureDriver implements GeicoDiscount {
+  id: ID!
+  type: DiscountType!
+  description: String!
+  amount: Decimal!
+  percentage: Decimal
+  appliedAt: DateTime!
+  eligibilityCriteria: String
+  courseCompletionDate: Date
+  minimumAge: Int
+}
+
+"""Discount for a newly manufactured vehicle."""
+type NewVehicle implements GeicoDiscount {
+  id: ID!
+  type: DiscountType!
+  description: String!
+  amount: Decimal!
+  percentage: Decimal
+  appliedAt: DateTime!
+  eligibilityCriteria: String
+  modelYear: Int!
+}
+
+"""Discount for full-time students who maintain good academic standing."""
+type GoodStudent implements GeicoDiscount {
+  id: ID!
+  type: DiscountType!
+  description: String!
+  amount: Decimal!
+  percentage: Decimal
+  appliedAt: DateTime!
+  eligibilityCriteria: String
+  schoolName: String
+  gpa: Decimal
+  verificationRequired: Boolean!
+}
+
+# ─────────────────────────────────────────────
+# DriveEasy Telematics
+# ─────────────────────────────────────────────
+
+"""The DriveEasy telematics program enrollment for a policy or holder."""
+type DriveEasy {
+  id: ID!
+  policyId: ID!
+  enrolledAt: DateTime!
+  active: Boolean!
+  currentScore: DriveScore
+  trips: [DriveEasyTrip!]!
+  potentialDiscount: Decimal
+}
+
+"""A single trip recorded by the DriveEasy mobile app."""
+type DriveEasyTrip {
+  id: ID!
+  driveEasyId: ID!
+  startTime: DateTime!
+  endTime: DateTime!
+  distanceMiles: Decimal!
+  speedingEvents: Int!
+  hardBrakingEvents: Int!
+  phoneUsageEvents: Int!
+  nightDrivingMinutes: Int
+  tripScore: Decimal!
+  route: JSON
+}
+
+"""Aggregate safe-driving score derived from DriveEasy trip data."""
+type DriveScore {
+  id: ID!
+  driveEasyId: ID!
+  score: Decimal!
+  grade: String!
+  tripsAnalyzed: Int!
+  totalMiles: Decimal!
+  speedingScore: Decimal!
+  brakingScore: Decimal!
+  phoneScore: Decimal!
+  lastUpdated: DateTime!
+  discountEarned: Decimal
+}
+
+# ─────────────────────────────────────────────
+# Claims
+# ─────────────────────────────────────────────
+
+"""An insurance claim filed against a GEICO policy."""
+type Claim {
+  id: ID!
+  claimNumber: String!
+  policyId: ID!
+  policy: Policy!
+  incidentDate: Date!
+  reportedDate: Date!
+  description: String!
+  status: ClaimStatus!
+  adjuster: ClaimAdjuster
+  repairShops: [RepairShop!]!
+  estimates: [Estimate!]!
+  payments: [ClaimPayment!]!
+  rentalCar: RentalCar
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""The current status and lifecycle stage of an insurance claim."""
+type ClaimStatus {
+  id: ID!
+  claimId: ID!
+  code: ClaimStatusCode!
+  label: String!
+  description: String
+  updatedAt: DateTime!
+  estimatedResolutionDate: Date
+}
+
+"""A payment disbursed as part of a claim settlement."""
+type ClaimPayment {
+  id: ID!
+  claimId: ID!
+  amount: Decimal!
+  paymentDate: Date!
+  paymentMethod: String!
+  payee: String!
+  description: String
+  checkNumber: String
+}
+
+"""The GEICO claims adjuster assigned to a claim."""
+type ClaimAdjuster {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  email: String!
+  phone: String!
+  specialization: String
+  claimsHandled: Int
+}
+
+"""An auto body or service shop that can perform covered repairs."""
+type RepairShop {
+  id: ID!
+  name: String!
+  address: Address!
+  phone: String!
+  certified: Boolean!
+  geicoProgramShop: Boolean!
+  rating: Decimal
+  estimatedCompletionDays: Int
+}
+
+"""A damage estimate prepared for a claim."""
+type Estimate {
+  id: ID!
+  claimId: ID!
+  estimatorName: String!
+  estimateDate: Date!
+  totalAmount: Decimal!
+  laborCost: Decimal!
+  partsCost: Decimal!
+  paintCost: Decimal
+  notes: String
+  approved: Boolean!
+}
+
+"""A rental car arrangement provided during a covered claim repair."""
+type RentalCar {
+  id: ID!
+  claimId: ID!
+  rentalCompany: String!
+  confirmationNumber: String
+  startDate: Date!
+  endDate: Date
+  dailyRate: Decimal!
+  coverageLimit: Decimal!
+  vehicleClass: String
+}
+
+# ─────────────────────────────────────────────
+# Agent
+# ─────────────────────────────────────────────
+
+"""A GEICO local agent who serves customers in a geographic area."""
+type Agent {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  agencyName: String!
+  licenseNumber: String!
+  email: String!
+  phone: String!
+  address: Address!
+  statesLicensed: [String!]!
+  linesOfBusiness: [PolicyType!]!
+  acceptingNewClients: Boolean!
+}
+
+"""A locator result returning agents near a given ZIP code."""
+type AgentLocator {
+  zip: String!
+  radius: Int!
+  agents: [Agent!]!
+}
+
+# ─────────────────────────────────────────────
+# Authentication / API Credentials
+# ─────────────────────────────────────────────
+
+"""An API key issued to a B2B partner for integration purposes."""
+type APIKey {
+  id: ID!
+  key: String!
+  partnerId: ID!
+  description: String
+  scopes: [String!]!
+  createdAt: DateTime!
+  expiresAt: DateTime
+  active: Boolean!
+}
+
+"""A short-lived session token issued in exchange for a valid API key."""
+type Token {
+  id: ID!
+  token: String!
+  tokenType: String!
+  expiresAt: DateTime!
+  scopes: [String!]!
+  issuedAt: DateTime!
+}
+
+# ─────────────────────────────────────────────
+# Input Types
+# ─────────────────────────────────────────────
+
+input AddressInput {
+  street1: String!
+  street2: String
+  city: String!
+  state: String!
+  zip: String!
+  country: String
+}
+
+input VehicleInput {
+  vin: String!
+  use: VehicleUse!
+  annualMileage: Int
+  ownershipType: String
+  garagingAddress: AddressInput
+}
+
+input DriverInput {
+  firstName: String!
+  lastName: String!
+  dateOfBirth: Date!
+  gender: Gender
+  licenseNumber: String!
+  licenseState: String!
+  occupation: String
+  goodStudent: Boolean
+}
+
+input CoverageInput {
+  type: CoverageType!
+  limit: Decimal
+  deductibleAmount: Decimal
+}
+
+input RateQuoteInput {
+  policyType: PolicyType!
+  effectiveDate: Date!
+  policyHolder: PolicyHolderInput!
+  vehicles: [VehicleInput!]
+  coverages: [CoverageInput!]!
+}
+
+input PolicyHolderInput {
+  firstName: String!
+  lastName: String!
+  dateOfBirth: Date!
+  gender: Gender
+  maritalStatus: MaritalStatus
+  email: String!
+  phone: String
+  address: AddressInput!
+}
+
+input ClaimInput {
+  vehicleId: ID
+  incidentDate: Date!
+  description: String!
+  policeReportNumber: String
+  atFault: Boolean
+}
+
+input ClaimUpdateInput {
+  description: String
+  repairShopId: ID
+  rentalCarRequested: Boolean
+}
+
+input DiscountInput {
+  type: DiscountType!
+  supportingData: JSON
+}
+
+# ─────────────────────────────────────────────
+# Root Operations
+# ─────────────────────────────────────────────
+
+type Query {
+  """Fetch a single policy by ID. Returns any policy subtype."""
+  policy(id: ID!): Policy
+
+  """List all policies for a given policyholder."""
+  policies(holderId: ID!): [Policy!]!
+
+  """Fetch a policyholder by ID."""
+  policyHolder(id: ID!): PolicyHolder
+
+  """Look up a vehicle by its VIN number."""
+  vehicle(vin: String!): Vehicle
+
+  """Request a real-time rate quote for new coverage."""
+  rateQuote(input: RateQuoteInput!): RateQuote
+
+  """Fetch a single claim by ID."""
+  claim(id: ID!): Claim
+
+  """List all claims associated with a policy."""
+  claims(policyId: ID!): [Claim!]!
+
+  """List discounts applied to a specific policy."""
+  discounts(policyId: ID!): [GeicoDiscount!]!
+
+  """Fetch the current DriveEasy score for a policyholder."""
+  driveScore(holderId: ID!): DriveScore
+
+  """Fetch DriveEasy trip history for a DriveEasy enrollment."""
+  driveEasyTrips(driveEasyId: ID!, limit: Int, offset: Int): [DriveEasyTrip!]!
+
+  """Fetch a single agent by ID."""
+  agent(id: ID!): Agent
+
+  """Find local GEICO agents by ZIP code."""
+  agentLocator(zip: String!, radius: Int): AgentLocator
+
+  """Decode a VIN into year, make, model, and feature details."""
+  decodeVin(vin: String!): VIN
+
+  """List available auto makes for a given model year."""
+  autoMakes(year: Int!): [AutoMake!]!
+
+  """List available models for a given make and year."""
+  autoModels(makeId: ID!, year: Int!): [AutoModel!]!
+
+  """Fetch repair shops near a ZIP code, optionally filtered by certification."""
+  repairShops(zip: String!, radius: Int, certifiedOnly: Boolean): [RepairShop!]!
+}
+
+type Mutation {
+  """Initiate a new rate quote for a prospective customer."""
+  createQuote(input: RateQuoteInput!): RateQuote!
+
+  """Convert an accepted rate quote into a bound policy."""
+  bindPolicy(quoteId: ID!): Policy!
+
+  """Add a vehicle to an existing auto or motorcycle policy."""
+  addVehicle(policyId: ID!, vehicle: VehicleInput!): Vehicle!
+
+  """Remove a vehicle from a policy."""
+  removeVehicle(policyId: ID!, vehicleId: ID!): Boolean!
+
+  """Add a named insured or additional driver to a policy."""
+  addDriver(policyId: ID!, driver: DriverInput!): AdditionalDriver!
+
+  """Update coverage selections on an existing policy."""
+  updateCoverage(policyId: ID!, coverage: CoverageInput!): Coverage!
+
+  """File a new claim against a policy."""
+  fileClaim(policyId: ID!, input: ClaimInput!): Claim!
+
+  """Update an existing claim with new information."""
+  updateClaim(claimId: ID!, input: ClaimUpdateInput!): Claim!
+
+  """Enroll a policy in the DriveEasy telematics program."""
+  enrollDriveEasy(policyId: ID!): DriveEasy!
+
+  """Apply a qualifying discount to a policy."""
+  applyDiscount(policyId: ID!, discount: DiscountInput!): GeicoDiscount!
+
+  """Exchange a partner API key for a short-lived session token."""
+  issueToken(apiKey: String!): Token!
+
+  """Cancel an active policy."""
+  cancelPolicy(policyId: ID!, reason: String!): Policy!
+
+  """Renew an expiring policy."""
+  renewPolicy(policyId: ID!): Policy!
+}
