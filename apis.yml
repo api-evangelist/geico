@@ -25,6 +25,10 @@ x-no-public-api-reason: GEICO does not publish a public developer portal, OpenAP
   dealer integrations) are arranged under private B2B agreements rather than a self-service
   API program.
 common:
+- type: VulnerabilityDisclosure
+  url: security/geico-vulnerability-disclosure.yml
+- type: DomainSecurity
+  url: security/geico-domain-security.yml
 - type: GitHubOrganization
   url: https://github.com/GEICO
 - type: LinkedIn
