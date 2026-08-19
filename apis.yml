@@ -26,7 +26,7 @@ description: The second-largest private passenger auto insurance company in the 
   API.
 created: '2026-05-05'
 modified: '2026-05-16'
-specificationVersion: '0.19'
+specificationVersion: '0.23'
 apis: []
 x-no-public-api: true
 x-no-public-api-reason: GEICO does not publish a public developer portal, OpenAPI
