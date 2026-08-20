@@ -17,6 +17,11 @@ image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/geico.png
 tags:
 - Insurance
 - Auto Insurance
+- Property and Casualty
+- Direct to Consumer
+tags_raw:
+- Insurance
+- Auto Insurance
 - Property & Casualty
 - Direct-to-Consumer
 description: The second-largest private passenger auto insurance company in the United
