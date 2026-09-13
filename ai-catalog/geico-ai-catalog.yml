@@ -24,6 +24,7 @@ conformance:
   hard_failures: []
   soft_gaps:
   - content-type-not-ai-catalog-json
+  - did-web-does-not-resolve
   official_tool:
     tool: ARD conformance-test v0.9.1 (ards-project/ard-spec)
     status: PASS
@@ -41,6 +42,11 @@ conformance:
       ARD permits extension types without core registration.'
     - '[GEICO Sitemap] Media type ''application/xml'' is a valid application extension media type. ARD
       permits extension types without core registration.'
+  did_web:
+    identifier: did:web:www.geico.com
+    resolved: false
+    verification_methods: 0
+    http_status: 404
 catalog:
   host_display_name: GEICO
   host_identifier: did:web:www.geico.com
