@@ -80,5 +80,3 @@ common:
   url: https://www.geico.com/legal/
 - type: Login
   url: https://ecams.geico.com/login
-- url: graphql/geico-graphql.md
-  type: GraphQL
