@@ -1,4 +1,4 @@
-# GEICO (geico)
+# GEICO
 
 <!-- API-EVANGELIST-PROVENANCE:BEGIN -->
 > ### About this repository
@@ -66,38 +66,87 @@
 
 The second-largest private passenger auto insurance company in the United States and a subsidiary of Berkshire Hathaway. Known for its direct-to-consumer model, competitive rates, and iconic advertising campaigns. GEICO serves customers through its website, GEICO Mobile app, and call centers rather than through a public API.
 
-**URL:** [Visit APIs.json URL](https://raw.githubusercontent.com/api-evangelist/geico/refs/heads/main/apis.yml)
+**Areas:** Insurance · Auto Insurance · Property and Casualty · Direct to Consumer
 
-**Run:** [Capabilities Using Naftiko](https://github.com/naftiko/fleet?utm_source=api-evangelist&utm_medium=readme&utm_campaign=geico-api-evangelist&utm_content=repo)
+## GEICO on APIs.io
 
-## Tags:
+Everything profiled for GEICO is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/geico/](https://apis.io/providers/geico/)** — or go straight to one of the APIs or properties below.
 
- - Insurance, Auto Insurance, Property & Casualty, Direct-to-Consumer
+### Published properties
 
-## Timestamps
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
 
-- **Created:** 2026-05-05
-- **Modified:** 2026-05-16
+#### GraphQL (1)
 
-## APIs
+GraphQL schemas.
 
-GEICO does not publish a public developer portal, OpenAPI specs, or third-party developer API documentation for quoting, binding, claims, or policy servicing. GEICO's customer surface is the geico.com website, the GEICO Mobile app, and call centers. Any agent/partner integrations (comparative raters, dealer integrations) are arranged under private B2B agreements rather than a self-service API program.
+- [Moved to /providers/geico/](https://apis.io/graphqls/geico/geico-graphql/)
 
-## Common Properties
+#### Security (2)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Geico Domain Security](https://apis.io/security/geico/geico-domain-security/)
+- [Geico Vulnerability Disclosure](https://apis.io/security/geico/geico-vulnerability-disclosure/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
 
 - [Website](https://www.geico.com/)
-- [MobileApp](https://www.geico.com/mobile/)
-- [Quote](https://www.geico.com/auto-insurance/)
-- [Claims](https://www.geico.com/claims/)
-- [AboutUs](https://www.geico.com/about/)
-- [Careers](https://careers.geico.com/)
-- [ContactUs](https://www.geico.com/contact-us/)
-- [PrivacyPolicy](https://www.geico.com/privacy/)
-- [TermsOfService](https://www.geico.com/legal/)
-- [Login](https://ecams.geico.com/login)
+- [Terms of service](https://www.geico.com/legal/)
+- [Privacy policy](https://www.geico.com/privacy/)
+- [GitHub](https://github.com/GEICO)
 
-## Maintainers
+## API Evangelist rating
 
-**FN:** API Evangelist
+**Kin Score 9.4** — minimal · rubric 0.24.0 · scored 2026-10-17
 
-**Email:** info@apievangelist.com
+| Facet | Score |
+|---|---|
+| Discoverability | 33.9 |
+| Contract quality | 0.0 |
+| Contract governance | 0.0 |
+| Operational transparency | 2.6 |
+| Developer ergonomics | 0.0 |
+| Access clarity | 27.6 |
+
+**Agent readiness 0.0** — human-only
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | — |
+| Agentic Access | — |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | — |
+| Idempotency | — |
+| Error Semantics | — |
+| OpenAPI Examples | — |
+| Rate Limit Signal | — |
+| Event Surface Described | — |
+| Agent Skills | — |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+
+**Regulatory alignment 17.5** — Insurance
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/geico/](https://apis.io/providers/geico/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for GEICO: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/geico/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
